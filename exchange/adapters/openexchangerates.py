@@ -23,7 +23,7 @@ class OpenExchangeRatesAdapter(BaseAdapter):
             getattr(settings, self.API_KEY_SETTINGS_KEY))
 
     def get_currencies(self):
-        return self.client.currencies().items()
+        return settings.CURRENCY_CHOICES_DICT.items()
 
     def get_exchangerates(self, base):
         return self.client.latest(base)['rates'].items()

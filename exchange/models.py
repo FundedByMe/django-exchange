@@ -23,6 +23,7 @@ class ExchangeRate(models.Model):
     source = models.ForeignKey('exchange.Currency', related_name='rates')
     target = models.ForeignKey('exchange.Currency')
     rate = models.DecimalField(max_digits=17, decimal_places=8)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     objects = ExchangeRateManager()
 

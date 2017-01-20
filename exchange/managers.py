@@ -16,5 +16,5 @@ class ExchangeRateManager(models.Manager):
         get_query_set = get_queryset
 
     def get_rate(self, source_currency, target_currency):
-        return self.get(source__code=source_currency,
-                        target__code=target_currency).rate
+        return self.filter(source__code=source_currency,
+                           target__code=target_currency).order_by('-created_at').first().rate

@@ -28,7 +28,7 @@ def _get_cache_key(source_currency, target_currency):
 
 
 def update_rates_cached():
-    rates = ExchangeRate.objects.all()
+    rates = ExchangeRate.objects.all() # TODO: only
     cache_map = {_get_cache_key(rate.source.code, rate.target.code): rate.rate
                  for rate in rates}
     cache.set_many(cache_map, timeout=CACHE_TIMEOUT)

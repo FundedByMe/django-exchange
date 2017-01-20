@@ -19,23 +19,19 @@ class BaseAdapter(object):
         corresponding ``Currency`` and ``ExchangeRate`` models
 
         """
-        currencies = self.get_currencies()
-        for code, name in currencies:
-            _, created = Currency.objects.get_or_create(
+        available_currencies = self.get_currencies()
+        currencies = []
+        for code, name in available_currencies:
+            obj, created = Currency.objects.get_or_create(
                 code=code, defaults={'name': name})
             if created:
                 logger.info('currency: %s created', code)
+            currencies.append(obj)
 
-        existing = ExchangeRate.objects.values('source__code',
-                                               'target__code',
-                                               'id')
-        existing = {(d['source__code'], d['target__code']): d['id']
-                    for d in existing}
         usd_exchange_rates = dict(self.get_exchangerates('USD'))
 
-        updates = []
         inserts = []
-        currencies = list(Currency.objects.all())
+
         for source in currencies:
             for target in currencies:
                 rate = self._get_rate_through_usd(source.code,
@@ -46,19 +42,11 @@ class BaseAdapter(object):
                                              target=target,
                                              rate=rate)
 
-                if (source.code, target.code) in existing:
-                    exchange_rate.id = existing[(source.code, target.code)]
-                    updates.append(exchange_rate)
-                    logger.debug('exchange rate updated %s/%s=%s'
-                                 % (source, target, rate))
-                else:
-                    inserts.append(exchange_rate)
-                    logger.debug('exchange rate created %s/%s=%s'
-                                 % (source, target, rate))
+                inserts.append(exchange_rate)
+                logger.debug('exchange rate created %s/%s=%s'
+                             % (source, target, rate))
 
             logger.info('exchange rates updated for %s' % source.code)
-        logger.info("Updating %s rows" % len(updates))
-        update_many(updates)
         logger.info("Inserting %s rows" % len(inserts))
         insert_many(inserts)
         logger.info('saved rates to db')
