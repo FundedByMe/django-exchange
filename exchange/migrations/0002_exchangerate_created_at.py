@@ -28,5 +28,5 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(default=datetime.datetime(2017, 1, 20, 14, 59, 20, 269556, tzinfo=utc), auto_now_add=True),
             preserve_default=False,
         ),
-        migrations.RunPython(remove_unused_currencies)
+        migrations.RunPython(remove_unused_currencies, lambda *x, **y: None)
     ]
